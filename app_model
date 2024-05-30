@@ -1,0 +1,37 @@
+from flask import Flask, request, jsonify
+import joblib
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.model_selection import GridSearchCV
+
+#creamos una instancia de la app flask con el nombre "app"
+app = Flask(__name__)
+
+#cargamos el modelo previamente entrenado desde el archivo
+best_rf_model = joblib.load('modelo_random_forest.joblib')
+
+#definimos el endpoint
+@app.route("/")
+def landing_page():
+    return "Consulta /predict para usar el modelo."
+
+@app.route("/predict", methods=["GET"])
+def predict():
+    try:
+        #obtenemos los datos de entrada desde la solicitud
+        datos_entrada = request.args.get("input_data")
+        #comprobamos si se proporcionaron datos de entrada, si no, devuelve mensaje de error 400 (solicitud incorrecta)
+        if datos_entrada is None:
+            return jsonify({"error": "Datos de entrada no proporcionados"}), 400
+
+        #llamamos al modelo para obtener la predicción
+        resultado = best_rf_model.predict([datos_entrada])  
+        #devuelve la prediccion en formato json
+        return jsonify({"prediction": resultado[0]})
+    #si ocurren errores, devuelve un mensaje de error 500 (error interno del servidor) 
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+#si el archivo se ejecuta como el programa principal
+if __name__ == "__main__":
+    #ejecuta la app
+    app.run(debug=False) #debug=False para desactivar el modo de depuracion
