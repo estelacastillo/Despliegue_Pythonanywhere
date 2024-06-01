@@ -34,4 +34,4 @@ def predict():
 #si el archivo se ejecuta como el programa principal
 if __name__ == "__main__":
     #ejecuta la app
-    app.run(debug=False) #debug=False para desactivar el modo de depuracion
+    app.run(debug=False, port=8081) #debug=False para desactivar el modo de depuracion
